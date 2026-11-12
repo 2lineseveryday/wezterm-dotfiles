@@ -16,7 +16,10 @@ if is_windows then
 elseif is_macos then
     -- config.default_prog = { 'pwsh.exe', '-NoLogo' }
 elseif is_linux then
-    -- config.default_prog = { 'pwsh.exe', '-NoLogo' }
+    config.unix_domains = { { name = 'wezterm-uds' } }
+    config.default_gui_startup_args = { 'connect', 'wezterm-uds' };
+    config.default_domain = 'wezterm-uds'
+    config.default_prog = { '/usr/bin/fish' }
 end
 
 config.window_decorations = 'RESIZE'
@@ -34,5 +37,17 @@ config.window_decorations = 'RESIZE'
 --     button_hover_bg = '#3b3052',
 -- }
 --
+
+wezterm.on('update-status', function(window, pane)
+    -- 현재 pane의 도메인 이름을 가져옵니다.
+    local domain_name = pane:get_domain_name()
+
+    -- 상태바에 텍스트 반영
+    window:set_right_status(wezterm.format({
+        { Background = { Color = '#333333' } },
+        { Foreground = { Color = '#ffffff' } },
+        { Text = ' Domain: ' .. domain_name .. '   ' },
+    }))
+end)
 
 return config
